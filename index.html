@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    html {
+        height: 100vh;
+        background-image: url(res/ico/bg.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        font-family: Helvetica;
+        font-variant-caps: all-small-caps;
+    }
+    body {
+        background-color: rgba(59, 0, 126, 0.363);
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+    }
+    body div {
+        max-width: 850px;
+        max-height: 850px;
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-gap: 5px;
+      width: fit-content;
+      height: fit-content;
+      padding: 50px;
+    }
+
+    .grid-item {
+      background-color: rgb(108, 204, 83);
+      width: 8px;
+      height: 8px;
+      border: 1px solid rgb(0, 0, 0);
+      padding: 0;
+      z-index: 5;
+    }
+
+    .grid-item.sec {
+      background-color: rgb(255, 187, 0);
+    }
+
+    .grid-item.tri {
+      background-color: rgb(0, 195, 255);
+    }
+    div.float {
+        position: absolute;
+        top: 9%;
+        left: 20px;
+    }
+    div ul{
+        list-style: none;
+        padding: 0px;
+        margin: 0px;
+    }
+    div ul li{
+        margin-bottom: 5px;
+    }
+    div ul li::before{
+        display: inline-block;
+        content: "";
+        width: 8px;
+        height: 8px;
+        border: 1px solid black;
+        margin-right: 3px;
+    }
+    div ul li.pri::before{
+        background-color: rgb(108, 204, 83);
+    }
+    div ul li.sec::before{
+        background-color: rgb(255, 187, 0);;
+    }
+    div ul li.tri::before{
+        background-color: rgb(0, 195, 255);
+    }
+  </style>
+</head>
+<body>
+    <div class="float">
+        <ul>
+            <li class="pri">Public space</li>
+            <li class="sec">Private building</li>
+            <li class="tri">Public building</li>
+        </ul>
+    </div>
+    <div id="body">
+    </div>
+</body>
+<script>
+    function parseHTML(html) 
+    {   
+        let t = document.createElement("template");   
+        t.innerHTML = html;
+        return t.content; 
+    }
+
+    function createElement(colors) 
+    {
+        let template = 
+        `<div class="grid-container">
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        <div class="grid-item"></div>
+        </div>`;
+
+        let e = parseHTML(template);
+        for (let i = 0; i < 25; i++)
+        {
+            e.firstElementChild.children[i].classList.add(colors[i]);
+        }
+        return e;
+    }
+
+    function generateColorCombinations()
+    {
+        function getRandomInt(max) 
+        {
+            return Math.floor(Math.random() * max);
+        }
+
+        function getRandomRange(min, max)
+        {
+            return min+getRandomInt(max-min);
+        }
+
+        function shuffleArray(array) 
+        {
+            for (var i = array.length - 1; i > 0; i--) 
+            {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+        
+        let secLimit = getRandomRange(18,75);
+        console.log(secLimit);
+
+        function generateBlank(blank)
+        {
+            let numS = getRandomInt(4);
+            let numT = 1;
+            let numP = 25 - (numS + numT);
+            secLimit -= numS;
+            if (secLimit < 0)
+            {
+                let numP = 25 - (numT -secLimit);
+            }
+
+            for (let i = 0; i < numP; i++)
+            {
+                blank.push("pri");
+            }
+
+            for (let i = 0; i < numS; i++)
+            {
+                blank.push("sec");
+            }
+
+            blank.push("tri");
+            console.log(blank);
+            return(blank);
+        }
+
+        let all = [];
+        for (let i = 0; i < 25; i++)
+        {
+            let blank = [];
+            generateBlank(blank);
+            shuffleArray(blank);
+            all.push(blank);
+        }
+        shuffleArray(all)
+        return all;
+    }
+
+
+    function loadElements()
+    {
+        let colors = generateColorCombinations();
+        console.log(colors);
+        let parent = document.getElementById("body");
+        console.log(parent);
+
+        colors.forEach( colors => {
+            parent.appendChild(createElement(colors));
+        });
+    }
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawLines() {
+        let grids = document.getElementsByClassName("grid-container");
+        let items = [];
+        for (let i = 0; i < grids.length; i++) {
+            if (grids[i].getElementsByClassName('sec').length == 0) {
+                items.push(grids[i].getElementsByClassName("tri"));
+            }
+        }
+        console.log(items);
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        document.body.appendChild(canvas);
+       
+        ctx.strokeStyle = 'rgba(108, 204, 83, 0.4)';
+        ctx.lineWidth = 3;
+
+        items.forEach((item, index) => {
+            const rect1 = item[0].getBoundingClientRect();
+            const lines = [];
+            for (let i = index + 1; i < items.length; i++) {
+                const rect2 = items[i][0].getBoundingClientRect();
+                ctx.beginPath();
+                ctx.moveTo(rect1.x - canvas.offsetLeft + 4, rect1.y - canvas.offsetTop + 4);
+                ctx.lineTo(rect2.x - canvas.offsetLeft + 4, rect2.y - canvas.offsetTop + 4);
+                ctx.stroke();
+            }
+        });
+    }
+
+    loadElements();
+    drawLines();
+    window.addEventListener('resize', (e) => { ctx.clearRect(0, 0, window.innerHeight, window.innerWidth); drawLines(); });
+  </script>
+</html>
